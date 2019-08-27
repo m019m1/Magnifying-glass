@@ -1,2 +1,2 @@
-# Magnifying-glass
+# magnifyingGlass
 mygnifying glass plugin for compressed images
