@@ -1,0 +1,16 @@
+.loupe {
+	width: 200px;
+	height: 200px;
+	border-radius: 50%;
+	border: 1px solid grey;
+	position: absolute;
+	cursor: none;
+	transform: translate(-50%,-50%);
+}
+img {
+	width: 40%;
+	margin: 50px;
+}
+.helperImg {
+	width: initial;
+}
