@@ -18,6 +18,7 @@ function showLoupe() {
 	loupe.style.background = `url('Treehouse.jpg') no-repeat ${-newX}px ${-newY}px`;
 	document.body.append(loupe);
 	moveAt(loupe, event.pageX, event.pageY);
+	img1.removeEventListener("mouseenter", showLoupe);
 	document.addEventListener('mousemove', onMouseMove);
 }
 
@@ -43,6 +44,7 @@ function onMouseMove(e) {
 	if(e.clientX < left || e.clientX > right || e.clientY < top1 || e.clientY > bottom) {
 		document.removeEventListener('mousemove', onMouseMove);
 		loupe.remove();
+		img1.addEventListener("mouseenter", showLoupe);
 	}
 
 }
