@@ -1,51 +1,58 @@
 class magnifyingGlass {
-	constructor(elem) {
+	constructor(elem, radius) {
 		this._img = elem;
+		this._loupeRadius = radius;
 		this.getListeners();
 	}
 	getListeners() {
-		this.getOriginalWidth();
 		this._img.addEventListener("mouseenter", showLoupe);
-		let loupe, top, left, right, bottom, scale;
-		let img = this._img;
-		let originalWidth = this._originalWidth;
+		let top, left, right, bottom, scale;
+		let self = this;
 
 		function showLoupe(event) {
-			loupe = document.createElement("div");
-			loupe.className = 'loupe';
-
-/* 			let [newX, newY] = getPosition(img, event);
-			loupe.style.background = `url('Treehouse.jpg') no-repeat ${-newX}px ${-newY}px`;
-			moveAt(loupe, event.pageX, event.pageY); */
+			self.getOriginalWidth();
+			self._loupe = document.createElement("div");
+			self._loupe.className = 'loupe';
+			self._loupe.style.width = self._loupe.style.height = `${self._loupeRadius * 2}px`;
+			if(!self._loupe.style.background) {
+				self._loupe.style.background =  `url('${self._img.getAttribute("src")}') no-repeat `;
+			}
 			onMouseMove(event);
-			document.body.append(loupe);
-			img.removeEventListener("mouseenter", showLoupe);
-			document.addEventListener("mousemove", onMouseMove);
+			document.body.append(self._loupe);
+			self._img.removeEventListener("mouseenter", showLoupe);
+			self._loupe.addEventListener("mousemove", onMouseMove);
 		}
-		function getPosition(elem, event) {
+		function onMouseMove(e) {
+			moveAt(self._loupe, e.pageX, e.pageY); 
+			let [newX, newY] = getShifts(self._img, event);
+			self._loupe.style.backgroundPosition = `${-newX}px ${-newY}px`;
+			if(e.clientX < left || e.clientX > right || e.clientY < top || e.clientY > bottom) {
+				self._loupe.remove();
+				self._img.addEventListener("mouseenter", showLoupe);
+				return;
+			}
+		}
+		function getShifts(elem, event) {
 			left = elem.getBoundingClientRect().left;
 			right = elem.getBoundingClientRect().right;
 			top = elem.getBoundingClientRect().top;
 			bottom = elem.getBoundingClientRect().bottom;
-			scale = originalWidth / (right - left);
-			return [(event.clientX - left) * scale - 100, (event.clientY - top) * scale - 100];
+			scale = self._originalWidth / (right - left);
+			return [(event.clientX - left) * scale - self._loupeRadius, 
+							(event.clientY - top) * scale - self._loupeRadius];
 		}
-		function moveAt(elem, pageX, pageY){
+		const moveAt = function(elem, pageX, pageY){
 			elem.style.left = `${pageX}px`;
 			elem.style.top = `${pageY}px`;
 		}
-		function onMouseMove(e) {
-			moveAt(loupe, e.pageX, e.pageY); 
-			let [newX, newY] = getPosition(img, event);
-			loupe.style.background = `url('${img.getAttribute("src")}') no-repeat ${-newX}px ${-newY}px`;
-			if(e.clientX < left || e.clientX > right || e.clientY < top || e.clientY > bottom) {
-				document.removeEventListener("mousemove", onMouseMove);
-				loupe.remove();
-				img.addEventListener("mouseenter", showLoupe);
-			}
-		}
 	}
+
+	// this function may be useful outside
 	getOriginalWidth() {
+		 // for speed-up get originalWidth only when entered the image and only once
+		if(this._originalWidth) {
+			return;
+		}
 		let helperImg = document.createElement("img");
 		helperImg.className = "helperImg";
 		helperImg.setAttribute("src", this._img.getAttribute("src"));
@@ -54,62 +61,7 @@ class magnifyingGlass {
 		helperImg.remove();
 	}
 }
-// let image = new magnifyingGlass(document.querySelectorAll("img")[0]);
 let images = document.querySelectorAll("img");
-let loupes = [];
-for(image of images) {
-	loupes.push(new magnifyingGlass(image));
+for(let image of images) {
+	image = new magnifyingGlass(image, 150);
 }
-
-
-/* let loupe;
-let img1 = document.querySelector("img");
-let originalWidth;
-img1.addEventListener("mouseenter", showLoupe);
-let top1, left, right, bottom, scale;
-
-function showLoupe() {
-	loupe = document.createElement("div");
-	loupe.className = 'loupe';
-	let helperImg = document.createElement("img");
-	helperImg.className = "helperImg";
-	helperImg.setAttribute("src", img1.getAttribute("src"));
-	document.body.after(helperImg);
-	originalWidth = helperImg.getBoundingClientRect().right - helperImg.getBoundingClientRect().left;
-	helperImg.remove();
-
-	let [newX, newY] = getPosition(img1, event);
-	loupe.style.background = `url('Treehouse.jpg') no-repeat ${-newX}px ${-newY}px`;
-	document.body.append(loupe);
-	moveAt(loupe, event.pageX, event.pageY);
-	img1.removeEventListener("mouseenter", showLoupe);
-	document.addEventListener('mousemove', onMouseMove);
-}
-
-function getPosition(elem, event) {
-	left = elem.getBoundingClientRect().left;
-	right = elem.getBoundingClientRect().right;
-	top1 = elem.getBoundingClientRect().top;
-	bottom = elem.getBoundingClientRect().bottom;
-	scale = originalWidth / (right - left);
-	return [(event.clientX - left) * scale - 100, (event.clientY - top1) * scale - 100];
-}
-
-function moveAt(el, pageX, pageY){
-	el.style.left = `${pageX}px`;
-	el.style.top = `${pageY}px`;
-}
-
-function onMouseMove(e) {
-	moveAt(loupe, e.pageX, e.pageY); 
-	
-	let [newX, newY] = getPosition(img1, event);
-	loupe.style.background = `url('Treehouse.jpg') no-repeat ${-newX}px ${-newY}px`;
-	if(e.clientX < left || e.clientX > right || e.clientY < top1 || e.clientY > bottom) {
-		document.removeEventListener('mousemove', onMouseMove);
-		loupe.remove();
-		img1.addEventListener("mouseenter", showLoupe);
-	}
-
-}
- */
