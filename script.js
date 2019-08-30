@@ -2,12 +2,14 @@ class magnifyingGlass {
 	constructor(elem, radius) {
 		this._img = elem;
 		this._loupeRadius = radius;
-		this.getListeners();
+		this.run();
 	}
-	getListeners() {
-		this._img.addEventListener("mouseenter", showLoupe);
-		let top, left, right, bottom, scale;
+	run() {
+		let {left, right, top, bottom} = this._img.getBoundingClientRect();
+		let scale;
 		let self = this;
+
+		this._img.addEventListener("mouseenter", showLoupe);
 
 		function showLoupe(event) {
 			self.getOriginalWidth();
@@ -20,28 +22,25 @@ class magnifyingGlass {
 			onMouseMove(event);
 			document.body.append(self._loupe);
 			self._img.removeEventListener("mouseenter", showLoupe);
-			self._loupe.addEventListener("mousemove", onMouseMove);
+			document.addEventListener("mousemove", onMouseMove);
 		}
 		function onMouseMove(e) {
 			moveAt(self._loupe, e.pageX, e.pageY); 
-			let [newX, newY] = getShifts(self._img, event);
-			self._loupe.style.backgroundPosition = `${-newX}px ${-newY}px`;
+			changePosition(e);
+			
 			if(e.clientX < left || e.clientX > right || e.clientY < top || e.clientY > bottom) {
 				self._loupe.remove();
 				self._img.addEventListener("mouseenter", showLoupe);
-				return;
+				document.removeEventListener("mousemove", onMouseMove);
 			}
 		}
-		function getShifts(elem, event) {
-			left = elem.getBoundingClientRect().left;
-			right = elem.getBoundingClientRect().right;
-			top = elem.getBoundingClientRect().top;
-			bottom = elem.getBoundingClientRect().bottom;
+		function changePosition(event) {
 			scale = self._originalWidth / (right - left);
-			return [(event.clientX - left) * scale - self._loupeRadius, 
-							(event.clientY - top) * scale - self._loupeRadius];
+			let [newX, newY] =  [(event.clientX - left) * scale - self._loupeRadius, 
+												   (event.clientY - top) * scale - self._loupeRadius];
+			self._loupe.style.backgroundPosition = `${-newX}px ${-newY}px`;
 		}
-		const moveAt = function(elem, pageX, pageY){
+		function moveAt(elem, pageX, pageY){
 			elem.style.left = `${pageX}px`;
 			elem.style.top = `${pageY}px`;
 		}
@@ -55,13 +54,11 @@ class magnifyingGlass {
 		}
 		let helperImg = document.createElement("img");
 		helperImg.className = "helperImg";
-		helperImg.setAttribute("src", this._img.getAttribute("src"));
-		document.body.after(helperImg);
-		this._originalWidth = helperImg.getBoundingClientRect().right - helperImg.getBoundingClientRect().left;
-		helperImg.remove();
+		helperImg.src = this._img.src;
+		this._originalWidth = helperImg.width;
 	}
 }
 let images = document.querySelectorAll("img");
 for(let image of images) {
-	image = new magnifyingGlass(image, 150);
+	image = new magnifyingGlass(image, 120);
 }
