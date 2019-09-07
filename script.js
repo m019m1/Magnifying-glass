@@ -28,11 +28,11 @@ class magnifyingGlass {
 			self._loupe.className = 'loupe';
 			self._loupe.style.width = self._loupe.style.height = `${self._loupeRadius * 2}px`;
 			if(!self._loupe.style.background) {
-				self._loupe.style.background =  `url('${self._img.getAttribute("src")}') no-repeat `;
+				self._loupe.style.background =  `url('${this.getAttribute("src")}') no-repeat `;
 			}
 			onMouseMove(e);
 			document.body.append(self._loupe);
-			self._img.removeEventListener("mouseenter", showLoupe);
+			this.removeEventListener("mouseenter", showLoupe);
 			document.addEventListener("mousemove", onMouseMove);
 			
 		}
