@@ -5,17 +5,9 @@ class magnifyingGlass {
 		this.run();
 	}
 	run() {
-		let {left, right, top, bottom} = getCoords(this._img);
-		let originalWidth, scale;
-		let self = this;
-	
-		this._img.addEventListener("mouseenter", showLoupe);
-		this._img.addEventListener("touchstart", showLoupe);
-		this._img.addEventListener("touchend", removeLoupe);
-
+		const {left, right, top, bottom} = getCoords(this._img);
 		function getCoords(elem) {
-			let box = elem.getBoundingClientRect();
-		
+			let box = elem.getBoundingClientRect();	
 			return {
 				//expand border to 1px for correct border conditions
 				top: Math.round(box.top) - 1 + pageYOffset,
@@ -24,6 +16,13 @@ class magnifyingGlass {
 				right: Math.round(box.right) + 1 + pageXOffset
 			};
 		}
+		
+		let scale;
+		const self = this;
+	
+		this._img.addEventListener("mouseenter", showLoupe);
+		this._img.addEventListener("touchstart", showLoupe);
+		this._img.addEventListener("touchend", removeLoupe);
 
 		function showLoupe(e) {
 			self._loupe = document.createElement("div");
@@ -34,15 +33,12 @@ class magnifyingGlass {
 			}
 			onPointerMove(e);
 			document.body.append(self._loupe);
-			this.removeEventListener("mouseenter", showLoupe);
-			this.removeEventListener("touchstart", showLoupe);
 			document.addEventListener("mousemove", onPointerMove);
 			document.addEventListener("touchmove", onPointerMove);
-			
 		}
 		function onPointerMove() {
-			let pageX = ( (event.type == 'touchmove' || event.type == 'touchstart') ? event.touches[0].pageX : event.pageX);
-			let pageY = ((event.type == 'touchmove' || event.type == 'touchstart') ? event.touches[0].pageY : event.pageY);
+			const pageX = ( (event.type == 'touchmove' || event.type == 'touchstart') ? event.touches[0].pageX : event.pageX);
+			const pageY = ( (event.type == 'touchmove' || event.type == 'touchstart') ? event.touches[0].pageY : event.pageY);
 			moveAt(self._loupe, pageX, pageY);
 			changeBackgroundPosition(pageX, pageY);
 			event.preventDefault();
@@ -53,25 +49,22 @@ class magnifyingGlass {
 		}
 		function removeLoupe() {
 			self._loupe.remove();
-			self._img.addEventListener("mouseenter", showLoupe);
-			self._img.addEventListener("touchstart", showLoupe);
 			document.removeEventListener("mousemove", onPointerMove);
 			document.removeEventListener("touchmove", onPointerMove);
-		}
-		function changeBackgroundPosition(pageX, pageY) {
-			if(!originalWidth) {
-				let helperImg = document.createElement("img");
-				helperImg.src = self._img.src;
-				originalWidth = helperImg.width;
-			}
-			scale = originalWidth / (right - left);
-			let [newX, newY] =  [(pageX - left) * scale - self._loupeRadius, 
-												   (pageY - top) * scale - self._loupeRadius];
-			self._loupe.style.backgroundPosition = `${-newX}px ${-newY}px`;
 		}
 		function moveAt(elem, pageX, pageY){
 			elem.style.left = `${pageX}px`;
 			elem.style.top = `${pageY}px`;
+		}
+		function changeBackgroundPosition(pageX, pageY) {
+			//get scale once
+			if(!scale) {
+				const helperImg = document.createElement("img");
+				helperImg.src = self._img.src;
+				scale = helperImg.width / (right - left);
+			}
+			const [newX, newY] = [(pageX - left) * scale - self._loupeRadius, (pageY - top) * scale - self._loupeRadius];
+			self._loupe.style.backgroundPosition = `${-newX}px ${-newY}px`;
 		}
 	}
 }
